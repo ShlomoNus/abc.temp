@@ -1,0 +1,26 @@
+{
+  "name": "mod.earthquake-reports",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Earthquake reports monorepo — ETL, AI, and search APIs",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "dev:etl": "pnpm --filter @earthquake-reports/etl-lambda dev",
+    "dev:ai": "pnpm --filter @earthquake-reports/ai-lambda dev",
+    "dev:search": "pnpm --filter @earthquake-reports/search-api dev",
+    "build": "pnpm --filter @earthquake-reports/shared build && pnpm --filter \"./apps/*\" build",
+    "build:etl": "pnpm --filter @earthquake-reports/shared build && pnpm --filter @earthquake-reports/etl-lambda build",
+    "build:ai": "pnpm --filter @earthquake-reports/shared build && pnpm --filter @earthquake-reports/ai-lambda build",
+    "build:search": "pnpm --filter @earthquake-reports/shared build && pnpm --filter @earthquake-reports/search-api build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "prettier": "^3.5.3",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.12.1"
+}
