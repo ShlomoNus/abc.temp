@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "dev": "tsx src/index.ts",
+    "dev": "tsx watch src/test-server.ts",
     "build": "rimraf dist && pnpm run build:types && pnpm run build:js",
     "build:js": "tsx scripts/build.ts --prod",
     "build:dev": "tsx scripts/build.ts",

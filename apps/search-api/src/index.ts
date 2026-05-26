@@ -1,10 +1,21 @@
-import { Server } from "http";
+import { type Server } from "http";
 
+import { app } from "./app";
 import { CONFIG } from "./CONFIG";
-import { createServer } from "./server";
+import { isTestingEnvironment } from "./utils/general";
+import { logger } from "./utils/logger";
 
-const port = CONFIG.PORT || 3000;
-const server = createServer(port);
+const port = CONFIG.PORT;
+const server = app.listen(port, () => {
+  const baseUrl = `http://127.0.0.1:${port}`;
+
+  logger.info(`Server listening on port ${port}`);
+
+  if (isTestingEnvironment()) {
+    logger.info(`Test server at ${baseUrl}`);
+    logger.info(`Swagger UI at ${baseUrl}/testing/api-docs`);
+  }
+}) as Server;
 
 run(server).catch(err => {
   console.error(err);
@@ -12,33 +23,39 @@ run(server).catch(err => {
 
 async function gracefulShutdown(serverInstance: Server) {
   try {
-    console.info("Closing HTTP server...");
-    await serverInstance.close();
+    logger.info("Closing HTTP server...");
+    await new Promise<void>((resolve, reject) => {
+      serverInstance.close(error => {
+        if (error) {
+          reject(error);
+
+          return;
+        }
+
+        resolve();
+      });
+    });
 
     await new Promise(resolve => {
       setTimeout(resolve, 500);
     });
 
-    console.info("Server shut down gracefully.");
+    logger.info("Server shut down gracefully.");
   }
   catch(error) {
-    console.error("Error during graceful shutdown:", error);
+    logger.error({ err: error }, "Error during graceful shutdown");
   }
 }
 
-console.info("Starting server...");
-
 async function run(httpServer: Server) {
-  console.info(`Server listening on port ${port}`);
-
   process.on("SIGTERM", () => {
     void (async() => {
       try {
-        console.info("Received SIGTERM signal, shutting down gracefully...");
+        logger.info("Received SIGTERM signal, shutting down gracefully...");
         await gracefulShutdown(httpServer);
       }
       catch(error) {
-        console.error(error);
+        logger.error({ err: error }, "SIGTERM shutdown failed");
       }
     })();
   });
@@ -46,11 +63,11 @@ async function run(httpServer: Server) {
   process.on("SIGINT", () => {
     void (async() => {
       try {
-        console.info("Received SIGINT signal, shutting down gracefully...");
+        logger.info("Received SIGINT signal, shutting down gracefully...");
         await gracefulShutdown(httpServer);
       }
       catch(error) {
-        console.error(error);
+        logger.error({ err: error }, "SIGINT shutdown failed");
       }
     })();
   });

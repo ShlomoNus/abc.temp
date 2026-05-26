@@ -8,10 +8,6 @@ const testingRouter = Router();
 
 testingRouter.use(testingEndpointAccessMiddleware);
 
-testingRouter.get("/health", (_: Request, res: Response) => {
-  res.send("Hello, World!");
-});
-
 testingRouter.get("/openapi.json", (_: Request, res: Response) => {
   res.json(openApiDocument);
 });
