@@ -1,9 +1,9 @@
 import { randomInt } from "node:crypto";
 
+import type { ArchiveDocument } from "@earthquake-reports/shared";
 import { errors } from "@elastic/elasticsearch";
 
 import { ensureEsDocumentsIndex, getEsDocumentsIndexName } from "@/handlers/ensureEsIndex";
-import type { ArchiveDocument } from "@/types/data";
 import { esClient } from "@/utils/esClient";
 
 import { addDocumentBodySchema, type AddDocumentBodyInput } from "./schema";

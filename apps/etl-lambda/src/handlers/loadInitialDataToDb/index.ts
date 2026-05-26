@@ -1,7 +1,7 @@
+import type { ArchiveDocument, ArchiveDocumentSeed } from "@earthquake-reports/shared";
 import { estypes } from "@elastic/elasticsearch";
 
 import { ensureEsDocumentsIndex } from "@/handlers/ensureEsIndex";
-import type { ArchiveDocument, ArchiveDocumentSeed } from "@/types/data";
 import { esClient } from "@/utils/esClient";
 import { logger } from "@/utils/logger";
 

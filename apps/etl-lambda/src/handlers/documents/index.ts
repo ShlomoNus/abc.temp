@@ -1,7 +1,7 @@
+import type { ArchiveDocument } from "@earthquake-reports/shared";
 import { estypes } from "@elastic/elasticsearch";
 
 import { CONFIG } from "@/CONFIG";
-import type { ArchiveDocument } from "@/types/data";
 import { esClient } from "@/utils/esClient";
 
 const {

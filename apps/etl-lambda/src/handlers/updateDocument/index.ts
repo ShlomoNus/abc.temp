@@ -1,9 +1,9 @@
+import type { ArchiveDocument } from "@earthquake-reports/shared";
 import { errors } from "@elastic/elasticsearch";
 import { z } from "zod";
 
 import { addDocumentBodySchema, type AddDocumentBodyInput } from "@/handlers/addDocument/schema";
 import { getEsDocumentsIndexName } from "@/handlers/ensureEsIndex";
-import type { ArchiveDocument } from "@/types/data";
 import { esClient } from "@/utils/esClient";
 
 export type UpdateDocumentResult = {

@@ -1,8 +1,8 @@
 import { HeadObjectCommand, S3Client, type S3ClientConfig } from "@aws-sdk/client-s3";
+import type { ArchiveDocumentSeed } from "@earthquake-reports/shared";
 
 import { CONFIG } from "@/CONFIG";
 import { esBaseData } from "@/handlers/loadInitialDataToDb/consts";
-import type { ArchiveDocumentSeed } from "@/types/data";
 
 const S3_URL_PREFIX = "s3://";
 const HEAD_CONCURRENCY = 10;

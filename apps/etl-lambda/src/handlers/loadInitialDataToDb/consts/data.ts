@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
-
-import type { ArchiveDocumentSeed } from "@/types/data";
+import type { ArchiveDocumentSeed } from "@earthquake-reports/shared";
 
 export const esBaseData: ArchiveDocumentSeed[] = [
   {
