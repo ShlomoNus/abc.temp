@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "dev": "tsx src/index.ts",
-    "build": "pnpm run build:types && pnpm run build:js",
+    "build": "rimraf dist lambdaOutput && pnpm run build:types && pnpm run build:js",
     "build:js": "tsx scripts/build.ts --prod",
     "build:dev": "tsx scripts/build.ts",
     "typecheck": "tsc --noEmit",

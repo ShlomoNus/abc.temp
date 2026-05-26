@@ -12,9 +12,11 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit"
+    "build": "rimraf dist tsconfig.build.tsbuildinfo && pnpm run build:types && pnpm run build:js",
+    "build:js": "tsx scripts/build.ts --prod",
+    "typecheck": "tsc --noEmit",
+    "build:types": "tsc -p tsconfig.build.json"
   }
 }

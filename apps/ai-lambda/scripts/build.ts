@@ -5,11 +5,9 @@ import { TsconfigPathsPlugin } from "@esbuild-plugins/tsconfig-paths";
 import { build as esbuild } from "esbuild";
 import JSZip from "jszip";
 
-import { logger } from "@/utils/logger";
-
 const root = process.cwd();
 
-/** "@earthquake-reports/ai-lambda" → "aiLambda", "service-setup" → "serviceSetup" */
+/** "@earthquake-reports/etl-lambda" → "etlLambda", "service-setup" → "serviceSetup" */
 function packageNameToCamelCase(packageName: string): string {
   const baseName = packageName.includes("/") ? packageName.split("/")[1]! : packageName;
 
@@ -74,12 +72,12 @@ async function build(): Promise<void> {
   await buildLambda();
   await zipDist();
 
-  logger.info(`Built Lambda: ${outputFile}`);
-  logger.info(`Created zip: ${zipFile}`);
-  logger.info("Lambda handler: index.handler");
+  console.info(`Built Lambda: ${outputFile}`);
+  console.info(`Created zip: ${zipFile}`);
+  console.info("Lambda handler: index.handler");
 }
 
 build().catch(error => {
-  logger.error({ error }, "build: error");
+  console.error("build: error", error);
   process.exit(1);
 });

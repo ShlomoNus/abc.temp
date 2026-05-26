@@ -1,7 +1,7 @@
 /**
  * Package for AWS Lambda deploy (bundle + node_modules in zip).
  * Use when you need dependencies loaded from node_modules at runtime.
- * Run after: npm run build. Output: lambdaOutput/<packageName>.zip (with deps).
+ * Run after: pnpm run build. Output: lambdaOutput/<packageName>.zip (with deps).
  */
 import { execSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -48,7 +48,7 @@ function addDirToZip({ zip, dirPath, zipPath }: { zip: JSZip, dirPath: string, z
 }
 
 async function main(): Promise<void> {
-  execSync("npm run build", { cwd: root, stdio: "inherit" });
+  execSync("pnpm run build", { cwd: root, stdio: "inherit" });
 
   const zip = new JSZip();
 

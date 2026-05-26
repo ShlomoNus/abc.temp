@@ -5,7 +5,7 @@ Local Express API for seeding Elasticsearch, managing archive documents, and que
 ## Run the API locally
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Default base URL: `http://127.0.0.1:3080` (override with `PORT`).
@@ -108,7 +108,7 @@ melingo-es-v8.17.1:v12
 From the project folder, run:
 
 ```bash
-npm run docker:start
+pnpm run docker:start
 ```
 
 ## 3. Verify Elasticsearch
@@ -156,7 +156,7 @@ The Docker image is loaded manually from the `.tar` file only once.
 After the image is loaded, use:
 
 ```bash
-npm run docker:start
+pnpm run docker:start
 ```
 
 to start the containers.

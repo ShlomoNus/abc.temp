@@ -9,7 +9,7 @@
     "lint:fix": "eslint . --fix",
     "test:server": "tsx watch src/test-server.ts",
     "dev": "tsx watch src/test-server.ts",
-    "build": "pnpm run build:types && pnpm run build:js",
+    "build": "rimraf dist lambdaOutput && pnpm run build:types && pnpm run build:js",
     "build:js": "tsx scripts/build.ts --prod",
     "build:dev": "tsx scripts/build.ts",
     "typecheck": "tsc --noEmit",
