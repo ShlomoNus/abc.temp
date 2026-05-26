@@ -24,7 +24,7 @@
     "docker:clean": "docker compose down -v --remove-orphans"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^9.4.0",
+    "@elastic/elasticsearch": "^8.17.1",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
     "pino-pretty": "^13.1.3"
