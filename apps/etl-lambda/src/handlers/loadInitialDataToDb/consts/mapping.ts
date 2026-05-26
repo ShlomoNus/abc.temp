@@ -11,7 +11,7 @@ export const ES_INDEX_MAPPING_BODY: Omit<estypes.IndicesCreateRequest, "index"> 
       isPublish: { type: "boolean" },
       publishDate: { type: "keyword" },
       fileUrl: { type: "keyword" },
-      name: { type: "keyword" },
+      name: { type: "text" },
       size: { type: "keyword" },
       lastModified: { type: "date" },
       mediaType: { type: "keyword" },

@@ -2,6 +2,9 @@
 # Use these in Dev Tools Console (one block at a time).
 # This file only manages index lifecycle (create/mapping/read/delete).
 # Data loading is done by the app route (loadInitialDataToDb).
+#
+# Mapping changes (e.g. name: text) require deleting the index and recreating it,
+# then reloading data. PUT mapping cannot change an existing field type.
 
 # ----------------------------
 # 0) Optional: check cluster
@@ -16,20 +19,20 @@ PUT /earthquake-documents
   "mappings": {
     "properties": {
       "id": { "type": "integer" },
-      "fileName": {
-        "type": "text",
-        "fields": {
-          "raw": { "type": "keyword" }
-        }
-      },
-      "url": { "type": "keyword" },
       "type": { "type": "keyword" },
+      "summary": { "type": "text" },
+      "longSummary": { "type": "text" },
+      "status": { "type": "keyword" },
+      "isPublish": { "type": "boolean" },
+      "publishDate": { "type": "keyword" },
+      "fileUrl": { "type": "keyword" },
+      "name": { "type": "text" },
+      "size": { "type": "keyword" },
+      "lastModified": { "type": "date" },
+      "mediaType": { "type": "keyword" },
       "category": { "type": "keyword" },
       "subCategory": { "type": "keyword" },
-      "informationType": { "type": "keyword" },
       "language": { "type": "keyword" },
-      "isPublish": { "type": "boolean" },
-      "status": { "type": "keyword" },
       "createdAt": { "type": "date" },
       "updatedAt": { "type": "date" }
     }
@@ -42,9 +45,27 @@ PUT /earthquake-documents
 HEAD /earthquake-documents
 
 # ---------------------------------------------
-# 3) Read index mapping
+# 3) Get all field types (mapping)
 # ---------------------------------------------
+
+# Full mapping JSON (nested properties per field)
 GET /earthquake-documents/_mapping
+
+# Same mapping, only field definitions (easier to read in Dev Tools)
+GET /earthquake-documents/_mapping?filter_path=**.properties
+
+# Compact list: field name → Elasticsearch type (best quick overview)
+GET /earthquake-documents/_field_caps?fields=*
+
+# Field caps for one field only
+GET /earthquake-documents/_field_caps?fields=name
+
+# Sample one document to see actual stored values (not types)
+GET /earthquake-documents/_search
+{
+  "size": 1,
+  "query": { "match_all": {} }
+}
 
 # ---------------------------------------------
 # 4) Basic count/search checks
@@ -59,8 +80,21 @@ GET /earthquake-documents/_search
   }
 }
 
+# Example: same query as search-api GET /search?term=עקיבא
+GET /earthquake-documents/_search
+{
+  "size": 100,
+  "track_total_hits": true,
+  "query": {
+    "multi_match": {
+      "query": "עקיבא",
+      "fields": ["name", "summary", "longSummary", "publishDate"],
+      "fuzziness": "AUTO"
+    }
+  }
+}
+
 # ---------------------------------------------
 # 5) Delete index (dangerous)
 # ---------------------------------------------
 DELETE /earthquake-documents
-
