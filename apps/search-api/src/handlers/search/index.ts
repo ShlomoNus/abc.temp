@@ -1,9 +1,9 @@
+import type { ArchiveDocument } from "@/types/data";
+import { esClient } from "@/utils/esClient";
+
 import { MAX_SEARCH_RESULTS, SEARCH_FIELDS } from "./consts";
 import type { SearchDocumentsResult } from "./types";
 import { getIndexName, getTotalHits, isDefined, mapSearchHit } from "./utils";
-
-import type { ArchiveDocument } from "@/types/data";
-import { esClient } from "@/utils/esClient";
 
 export async function searchDocuments(term: string): Promise<SearchDocumentsResult> {
   const query = term.trim();

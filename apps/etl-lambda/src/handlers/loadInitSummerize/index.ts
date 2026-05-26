@@ -1,7 +1,7 @@
-import { GetSummerizeResult } from "./types";
-
 import { esBaseData } from "@/handlers/loadInitialDataToDb/consts";
 import { AiService } from "@/services/ai/AiService";
+
+import { GetSummerizeResult } from "./types";
 
 export async function loadInitSummerize(): Promise<GetSummerizeResult> {
   const failed: number[] = [];

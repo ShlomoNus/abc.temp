@@ -1,7 +1,7 @@
+import { isTestingEnvironment } from "@/utils/general";
+
 import { swaggerRoutes } from "./routes";
 import { testingSwaggerRoutes } from "./testingRoutes";
-
-import { isTestingEnvironment } from "@/utils/general";
 
 const shouldAddTestingSwaggerRoutes = isTestingEnvironment();
 

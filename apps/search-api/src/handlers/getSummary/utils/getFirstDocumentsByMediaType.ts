@@ -1,11 +1,11 @@
+import type { ArchiveDocument, MediaType } from "@/types/data";
+import { esClient } from "@/utils/esClient";
+
 import { DOCUMENTS_PER_MEDIA_TYPE } from "../consts";
 
 import { getIndexName } from "./getIndexName";
 import { isDefined } from "./isDefined";
 import { mapSearchHit } from "./mapSearchHit";
-
-import type { ArchiveDocument, MediaType } from "@/types/data";
-import { esClient } from "@/utils/esClient";
 
 export async function getFirstDocumentsByMediaType(mediaType: MediaType): Promise<ArchiveDocument[]> {
   const response = await esClient.search<ArchiveDocument>({

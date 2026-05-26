@@ -1,8 +1,8 @@
+import type { ArchiveDocument, MediaType } from "@/types/data";
+
 import { MEDIA_TYPES } from "./consts";
 import type { GetSummaryResult } from "./types";
 import { getFirstDocumentsByMediaType } from "./utils";
-
-import type { ArchiveDocument, MediaType } from "@/types/data";
 
 export async function getSummary(): Promise<GetSummaryResult> {
   const entries = await Promise.all(

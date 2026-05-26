@@ -2,11 +2,11 @@ import { randomInt } from "node:crypto";
 
 import { errors } from "@elastic/elasticsearch";
 
-import { addDocumentBodySchema, type AddDocumentBodyInput } from "./schema";
-
 import { ensureEsDocumentsIndex, getEsDocumentsIndexName } from "@/handlers/ensureEsIndex";
 import type { ArchiveDocument } from "@/types/data";
 import { esClient } from "@/utils/esClient";
+
+import { addDocumentBodySchema, type AddDocumentBodyInput } from "./schema";
 
 export type AddDocumentResult = {
   document: ArchiveDocument

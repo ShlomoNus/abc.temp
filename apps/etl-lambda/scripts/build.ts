@@ -5,6 +5,8 @@ import { TsconfigPathsPlugin } from "@esbuild-plugins/tsconfig-paths";
 import { build as esbuild } from "esbuild";
 import JSZip from "jszip";
 
+import { logger } from "@/utils/logger";
+
 const root = process.cwd();
 
 /** "@earthquake-reports/etl-lambda" → "etlLambda", "service-setup" → "serviceSetup" */
@@ -54,12 +56,16 @@ async function buildLambda(): Promise<void> {
 
 async function zipDist(): Promise<void> {
   const zip = new JSZip();
+
   zip.file("index.js", fs.readFileSync(outputFile));
   const mapFile = `${outputFile}.map`;
+
   if (fs.existsSync(mapFile)) {
     zip.file("index.js.map", fs.readFileSync(mapFile));
   }
+
   const buffer = await zip.generateAsync({ type: "nodebuffer" });
+
   fs.writeFileSync(zipFile, buffer);
 }
 
@@ -68,12 +74,12 @@ async function build(): Promise<void> {
   await buildLambda();
   await zipDist();
 
-  console.log(`Built Lambda: ${outputFile}`);
-  console.log(`Created zip: ${zipFile}`);
-  console.log("Lambda handler: index.handler");
+  logger.info(`Built Lambda: ${outputFile}`);
+  logger.info(`Created zip: ${zipFile}`);
+  logger.info("Lambda handler: index.handler");
 }
 
 build().catch(error => {
-  console.error(error);
+  logger.error({ error }, "build: error");
   process.exit(1);
 });

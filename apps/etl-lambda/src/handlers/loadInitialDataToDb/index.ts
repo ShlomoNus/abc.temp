@@ -1,12 +1,12 @@
 import { estypes } from "@elastic/elasticsearch";
 
-import { esBaseData } from "./consts";
-import { LoadInitialDataResult } from "./types";
-
 import { ensureEsDocumentsIndex } from "@/handlers/ensureEsIndex";
 import type { ArchiveDocument, ArchiveDocumentSeed } from "@/types/data";
 import { esClient } from "@/utils/esClient";
 import { logger } from "@/utils/logger";
+
+import { esBaseData } from "./consts";
+import { LoadInitialDataResult } from "./types";
 
 const BULK_CHUNK_SIZE = 200;
 
