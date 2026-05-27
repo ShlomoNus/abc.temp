@@ -11,10 +11,7 @@
       "@earthquake-reports/shared": [
         "../../packages/shared/src/index.ts"
       ]
-    },
-    "types": [
-      "node"
-    ]
+    }
   },
   "include": [
     "src/**/*.ts",
