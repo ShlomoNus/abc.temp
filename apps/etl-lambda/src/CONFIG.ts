@@ -1,4 +1,4 @@
-import { bool, cleanEnv, str } from "envalid";
+import { bool, cleanEnv, num, str } from "envalid";
 
 import { nodeEnvOption } from "./consts/general";
 
@@ -13,6 +13,8 @@ export const CONFIG = cleanEnv(process.env, {
     choices: nodeEnvOption
   }),
   S3_BUCKET_NAME: str({ default: "s3-content-earthquake-dev" }),
+  /** Max HeadBucket calls per day for verifyAIBucketExistence (1 = at most once every 24h). */
+  S3_BUCKET_VERIFY_CHECKS_PER_DAY: num({ default: 1 }),
   S3_INIT_LOAD_FOLDER_PREFIX: str({ default: "init-load/" }),
   S3_INCOMING_FILES_FOLDER_PREFIX: str({ default: "incoming-files/" }),
   AI_LAMBDA_NAME: str({ default: "" }),

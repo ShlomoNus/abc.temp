@@ -281,10 +281,10 @@ export const swaggerRoutes = {
   },
   "/verifyEsBaseDataS3": {
     get: {
-      summary: "Verify esBaseData S3 objects exist (HeadObject per entry)",
+      summary: "Verify configured S3 bucket exists (HeadBucket)",
       responses: {
         200: {
-          description: "Per-row S3 HeadObject results for esBaseData",
+          description: "S3 bucket exists",
           content: {
             "application/json": {
               schema: {
@@ -293,28 +293,33 @@ export const swaggerRoutes = {
                   verifyResult: {
                     type: "object",
                     properties: {
-                      total: { type: "number" },
-                      found: { type: "number" },
-                      missing: { type: "number" },
-                      error: { type: "number" },
-                      items: {
-                        type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            id: { type: "number" },
-                            s3Key: { type: "string" },
-                            status: {
-                              type: "string",
-                              enum: ["found", "missing", "error"]
-                            },
-                            detail: { type: "string" }
-                          },
-                          required: ["id", "s3Key", "status"]
-                        }
-                      }
+                      bucket: { type: "string" },
+                      exists: { type: "boolean", enum: [true] }
                     },
-                    required: ["total", "found", "missing", "error", "items"]
+                    required: ["bucket", "exists"]
+                  }
+                },
+                required: ["verifyResult"]
+              }
+            }
+          }
+        },
+        503: {
+          description: "S3 bucket missing or unreachable",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  verifyResult: {
+                    type: "object",
+                    properties: {
+                      bucket: { type: "string" },
+                      exists: { type: "boolean", enum: [false] },
+                      notFound: { type: "boolean" },
+                      message: { type: "string" }
+                    },
+                    required: ["bucket", "exists"]
                   }
                 },
                 required: ["verifyResult"]

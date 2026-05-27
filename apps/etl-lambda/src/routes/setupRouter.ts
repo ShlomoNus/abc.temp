@@ -99,6 +99,12 @@ setupRouter.get("/verifyEsBaseDataS3", async(_: Request, res: Response) => {
   try {
     const verifyResult = await verifyEsBaseDataS3Urls();
 
+    if (!verifyResult.exists) {
+      res.status(503).json({ verifyResult });
+
+      return;
+    }
+
     res.json({ verifyResult });
   }
   catch(error: unknown) {

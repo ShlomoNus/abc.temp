@@ -22,6 +22,7 @@
     "@codegenie/serverless-express": "^4.17.1",
     "@earthquake-reports/shared": "workspace:*",
     "compression": "^1.8.1",
+    "dayjs": "^1.11.21",
     "dotenv": "^17.4.2",
     "envalid": "^8.1.1",
     "express": "^5.2.1",

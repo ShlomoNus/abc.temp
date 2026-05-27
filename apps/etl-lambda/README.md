@@ -20,7 +20,7 @@ Routes are grouped by intent. **Test** routes are blocked outside testing enviro
 | `GET` | `/getAll` | Product | Return all documents from the Elasticsearch index. |
 | `POST` | `/add` | Product | Add a document; server assigns a random 5-digit `id`. |
 | `PUT` | `/update/:id` | Product | Update a document by 5-digit `id` (`id` in the body cannot change). |
-| `GET` | `/verifyEsBaseDataS3` | Product | `HeadObject` each seed row’s S3 object (from `name` + `type`) and report per-file status. |
+| `GET` | `/verifyEsBaseDataS3` | Product | `HeadBucket` on `S3_BUCKET_NAME`. Returns **503** if the bucket is missing. |
 | `GET` | `/loadInitInfo` | Product | Ensure the ES index exists and bulk-index seed catalog data (`esBaseData`). |
 | `GET` | `/loadInitSummerize` | Product | Async-invoke the summarize Lambda once per seed file (`InvocationType: Event`). |
 | `GET` | `/testing/openapi.json` | Test | OpenAPI 3 document (setup routes + test routes when env allows). |
@@ -40,7 +40,8 @@ Archive files live in a single S3 bucket. Folder prefixes are configured via env
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `S3_BUCKET_NAME` | `s3-content-earthquake-dev` | S3 bucket for archive files |
-| `S3_INIT_LOAD_FOLDER_PREFIX` | `init-load/` | One-time seed catalog files (used by `esBaseData` and `/verifyEsBaseDataS3`) |
+| `S3_BUCKET_VERIFY_CHECKS_PER_DAY` | `1` | Max `HeadBucket` calls per day for `/verifyEsBaseDataS3` (in-process cache; `1` ≈ once every 24h, `24` ≈ hourly) |
+| `S3_INIT_LOAD_FOLDER_PREFIX` | `init-load/` | One-time seed catalog files (used by `esBaseData`) |
 | `S3_INCOMING_FILES_FOLDER_PREFIX` | `incoming-files/` | New uploads added after initial load |
 
 ### Object key layout
