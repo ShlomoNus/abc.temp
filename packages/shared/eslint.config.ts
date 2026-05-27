@@ -7,6 +7,7 @@ import tseslint from "typescript-eslint";
 import stylistic from "@stylistic/eslint-plugin";
 import { importX } from "eslint-plugin-import-x";
 import globals from "globals";
+import unusedImports from "eslint-plugin-unused-imports";
 
 const eslintConfigDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -64,11 +65,12 @@ export default defineConfig([
     settings: {
       "import-x/resolver-next": [
         createTypeScriptImportResolver({
-          project: path.join(eslintConfigDir, "tsconfig.json"),
+          project: path.join(eslintConfigDir, "tsconfig.eslint.json"),
           alwaysTryTypes: true,
         }),
       ],
     },
+
     rules: {
       // --- stylistic rules ---
       "@stylistic/semi": ["error", "always", { omitLastInOneLineBlock: true, omitLastInOneLineClassBody: true }],
@@ -129,10 +131,6 @@ export default defineConfig([
       // --- TypeScript rules ---
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_" }
-      ],
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/no-misused-promises": [
         "error",
@@ -163,5 +161,24 @@ export default defineConfig([
         }
       ]
     }
+  },
+  // --- unused-imports ---
+  {
+    plugins: {
+      "unused-imports": unusedImports,
+    },
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          "vars": "all",
+          "varsIgnorePattern": "^_",
+          "args": "after-used",
+          "argsIgnorePattern": "^_",
+        },
+      ]
+    },
   }
 ]);
