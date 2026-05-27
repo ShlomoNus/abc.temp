@@ -33,9 +33,6 @@ export const openApiDocument = {
           name: {
             type: "string"
           },
-          fileUrl: {
-            type: "string"
-          },
           type: {
             type: "string",
             enum: ["docs", "images", "audio", "video"]
@@ -108,7 +105,6 @@ export const openApiDocument = {
             type: "string",
             enum: ["audio", "video", "leaflets", "studies", "guides", "reports", "plans"]
           },
-          fileUrl: { type: "string" },
           name: { type: "string" },
           category: { type: "string" },
           subCategory: { type: "string" },
@@ -134,7 +130,6 @@ export const openApiDocument = {
         },
         required: [
           "type",
-          "fileUrl",
           "name",
           "mediaType",
           "category",
@@ -160,7 +155,6 @@ export const openApiDocument = {
             enum: ["init", "deleted", "updated"]
           },
           isPublish: { type: "boolean" },
-          fileUrl: { type: "string" },
           name: { type: "string" },
           mediaType: {
             type: "string",
@@ -191,7 +185,6 @@ export const openApiDocument = {
           "type",
           "status",
           "isPublish",
-          "fileUrl",
           "name",
           "mediaType",
           "category",

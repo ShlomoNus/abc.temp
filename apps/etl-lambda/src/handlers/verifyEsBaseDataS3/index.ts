@@ -3,19 +3,14 @@ import type { ArchiveDocumentSeed } from "@earthquake-reports/shared";
 
 import { CONFIG } from "@/CONFIG";
 import { esBaseData } from "@/handlers/loadInitialDataToDb/consts";
+import { buildS3ObjectKey } from "@/utils/s3";
 
-const S3_URL_PREFIX = "s3://";
 const HEAD_CONCURRENCY = 10;
-
-type ParsedS3Uri = {
-  bucket: string
-  key: string
-};
 
 export type VerifyEsBaseDataS3Item = {
   id: number
-  fileUrl: string
-  status: "found" | "missing" | "invalid_url" | "error"
+  s3Key: string
+  status: "found" | "missing" | "error"
   detail?: string
 };
 
@@ -23,28 +18,9 @@ export type VerifyEsBaseDataS3Result = {
   total: number
   found: number
   missing: number
-  invalidUrl: number
   error: number
   items: VerifyEsBaseDataS3Item[]
 };
-
-function parseS3Uri(fileUrl: string): ParsedS3Uri | null {
-  if (!fileUrl.startsWith(S3_URL_PREFIX)) {
-    return null;
-  }
-
-  const rest = fileUrl.slice(S3_URL_PREFIX.length);
-  const slash = rest.indexOf("/");
-
-  if (slash <= 0 || slash >= rest.length - 1) {
-    return null;
-  }
-
-  return {
-    bucket: rest.slice(0, slash),
-    key: rest.slice(slash + 1)
-  };
-}
 
 function isNotFound(err: unknown): boolean {
   if (!err || typeof err !== "object") {
@@ -62,18 +38,25 @@ function isNotFound(err: unknown): boolean {
     || e.$metadata?.httpStatusCode === 404;
 }
 
-async function headObjectExists(
-  client: S3Client,
-  parsed: ParsedS3Uri
-): Promise<
+type HeadObjectExistsParams = {
+  client: S3Client
+  bucket: string
+  key: string
+};
+
+async function headObjectExists({
+  client,
+  bucket,
+  key
+}: HeadObjectExistsParams): Promise<
   | { ok: true }
   | { ok: false, notFound: boolean, message: string }
 > {
   try {
     await client.send(
       new HeadObjectCommand({
-        Bucket: parsed.bucket,
-        Key: parsed.key
+        Bucket: bucket,
+        Key: key
       })
     );
 
@@ -94,28 +77,26 @@ async function verifyOne(
   client: S3Client,
   item: ArchiveDocumentSeed
 ): Promise<VerifyEsBaseDataS3Item> {
-  const parsed = parseS3Uri(item.fileUrl);
+  const s3Key = buildS3ObjectKey({
+    name: item.name,
+    folderPrefix: CONFIG.S3_INIT_LOAD_FOLDER_PREFIX
+  });
 
-  if (!parsed) {
-    return {
-      id: item.id,
-      fileUrl: item.fileUrl,
-      status: "invalid_url",
-      detail: "Expected s3://bucket/key"
-    };
-  }
-
-  const result = await headObjectExists(client, parsed);
+  const result = await headObjectExists({
+    client,
+    bucket: CONFIG.S3_BUCKET_NAME,
+    key: s3Key
+  });
 
   if (result.ok) {
-    return { id: item.id, fileUrl: item.fileUrl, status: "found" };
+    return { id: item.id, s3Key, status: "found" };
   }
 
   if (result.notFound) {
-    return { id: item.id, fileUrl: item.fileUrl, status: "missing", detail: result.message };
+    return { id: item.id, s3Key, status: "missing", detail: result.message };
   }
 
-  return { id: item.id, fileUrl: item.fileUrl, status: "error", detail: result.message };
+  return { id: item.id, s3Key, status: "error", detail: result.message };
 }
 
 type MapInChunksOptions<T, R> = {
@@ -169,7 +150,6 @@ export async function verifyEsBaseDataS3Urls(): Promise<VerifyEsBaseDataS3Result
 
   let found = 0;
   let missing = 0;
-  let invalidUrl = 0;
   let error = 0;
 
   for (const it of items) {
@@ -178,9 +158,6 @@ export async function verifyEsBaseDataS3Urls(): Promise<VerifyEsBaseDataS3Result
     }
     else if (it.status === "missing") {
       missing += 1;
-    }
-    else if (it.status === "invalid_url") {
-      invalidUrl += 1;
     }
     else {
       error += 1;
@@ -191,7 +168,6 @@ export async function verifyEsBaseDataS3Urls(): Promise<VerifyEsBaseDataS3Result
     total: items.length,
     found,
     missing,
-    invalidUrl,
     error,
     items
   };

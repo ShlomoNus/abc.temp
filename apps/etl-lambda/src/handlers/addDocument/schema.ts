@@ -36,7 +36,6 @@ export const addDocumentBodySchema = z
   .object({
     type: fileMediaTypeSchema,
     mediaType: mediaTypeSchema,
-    fileUrl: z.string().min(1, "fileUrl is required"),
     name: z.string().min(1, "name is required"),
     category: z.string().min(1, "category is required"),
     subCategory: z.string().min(1, "subCategory is required"),

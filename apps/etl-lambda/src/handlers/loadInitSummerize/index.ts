@@ -6,9 +6,9 @@ import { GetSummerizeResult } from "./types";
 export async function loadInitSummerize(): Promise<GetSummerizeResult> {
   const failed: number[] = [];
 
-  for (const { id, fileUrl, type } of esBaseData) {
+  for (const { id, name, type } of esBaseData) {
     try {
-      await AiService.invokeEvent({ id, fileUrl, type });
+      await AiService.initSummarize({ id, name, type });
     }
     catch {
       failed.push(id);

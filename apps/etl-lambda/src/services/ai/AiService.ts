@@ -1,12 +1,8 @@
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
+import { AIAddIncomingFileSummarizyPayload, AIInitSummarizePayload, AiLambdaBasePayload } from "@earthquake-reports/shared";
 
 import { CONFIG } from "@/CONFIG";
-import { logger } from "@/utils/logger";
-
-export type GetSummariesOptions = {
-  short: boolean
-  long: boolean
-};
+import { buildS3ObjectKey } from "@/utils/s3";
 
 export class AiService {
   static readonly aiLambdaName = CONFIG.AI_LAMBDA_NAME;
@@ -33,7 +29,7 @@ export class AiService {
   }
 
   /** Queue an async Lambda invocation and wait only for the invoke API to accept it. */
-  static async invokeEvent(payload: unknown): Promise<void> {
+  private static async invokeEvent(payload: AiLambdaBasePayload): Promise<void> {
     await this.getLambdaClient().send(
       new InvokeCommand({
         FunctionName: this.getFunctionName(),
@@ -43,10 +39,11 @@ export class AiService {
     );
   }
 
-  /** Fire-and-forget summarize request; does not wait for the Lambda to finish processing. */
-  static getSummaries(options: GetSummariesOptions): void {
-    void this.invokeEvent(options).catch((error: unknown) => {
-      logger.error({ err: error, options }, "AiService.getSummaries: invoke failed");
-    });
+  static async initSummarize({ id, name, type }: AIInitSummarizePayload): Promise<void> {
+    await this.invokeEvent({ id, fileLocation: buildS3ObjectKey({ name, folderPrefix: CONFIG.S3_INIT_LOAD_FOLDER_PREFIX }), type, isShortSummaryRequired: true });
+  }
+
+  static async incomingFileSummarize({ id, name, type, isShortSummaryRequired = false }: AIAddIncomingFileSummarizyPayload): Promise<void> {
+    await this.invokeEvent({ id, fileLocation: buildS3ObjectKey({ name, folderPrefix: CONFIG.S3_INCOMING_FILES_FOLDER_PREFIX }), type, isShortSummaryRequired });
   }
 }

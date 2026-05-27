@@ -20,7 +20,7 @@ Routes are grouped by intent. **Test** routes are blocked outside testing enviro
 | `GET` | `/getAll` | Product | Return all documents from the Elasticsearch index. |
 | `POST` | `/add` | Product | Add a document; server assigns a random 5-digit `id`. |
 | `PUT` | `/update/:id` | Product | Update a document by 5-digit `id` (`id` in the body cannot change). |
-| `GET` | `/verifyEsBaseDataS3` | Product | `HeadObject` each seed row’s `fileUrl` in S3 and report per-file status. |
+| `GET` | `/verifyEsBaseDataS3` | Product | `HeadObject` each seed row’s S3 object (from `name` + `type`) and report per-file status. |
 | `GET` | `/loadInitInfo` | Product | Ensure the ES index exists and bulk-index seed catalog data (`esBaseData`). |
 | `GET` | `/loadInitSummerize` | Product | Async-invoke the summarize Lambda once per seed file (`InvocationType: Event`). |
 | `GET` | `/testing/openapi.json` | Test | OpenAPI 3 document (setup routes + test routes when env allows). |
@@ -35,25 +35,26 @@ Routes are grouped by intent. **Test** routes are blocked outside testing enviro
 
 ## S3 folder naming
 
-Archive files live in a single S3 bucket. The bucket URI and folder prefixes are configured via environment variables (see `.env`):
+Archive files live in a single S3 bucket. Folder prefixes are configured via environment variables (see `.env`):
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `S3_EARTHQUAKE_REPORTS_SOURCE` | `s3://s3-content-earthquake-dev` | Base `s3://` URI for the reports bucket |
-| `S3_INIT_LOAD_PREFIX` | `init-load/` | One-time seed catalog files (used by `esBaseData` and `/verifyEsBaseDataS3`) |
-| `S3_INCOMING_FILES_PREFIX` | `incoming-files/` | New uploads added after initial load |
+| `S3_BUCKET_NAME` | `s3-content-earthquake-dev` | S3 bucket for archive files |
+| `S3_INIT_LOAD_FOLDER_PREFIX` | `init-load/` | One-time seed catalog files (used by `esBaseData` and `/verifyEsBaseDataS3`) |
+| `S3_INCOMING_FILES_FOLDER_PREFIX` | `incoming-files/` | New uploads added after initial load |
 
 ### Object key layout
 
-Each document’s `fileUrl` is a full S3 URI:
+S3 object keys are derived from `name` (not stored on the document):
 
 ```text
-{S3_EARTHQUAKE_REPORTS_SOURCE}/{prefix}{name}.{type}
+{prefix}{name}.docs
 ```
 
-- **`prefix`** — `init-load/` for seed data, or `incoming-files/` for newly added files.
+- **`prefix`** — `S3_INIT_LOAD_FOLDER_PREFIX` for seed data, or `S3_INCOMING_FILES_FOLDER_PREFIX` for newly added files.
 - **`name`** — document display name (must match the `name` field in Elasticsearch).
-- **`type`** — file media type; also used as the object extension: `docs`, `images`, `audio`, or `video`.
+
+Full URI for HeadObject / SDK calls: `s3://{S3_BUCKET_NAME}/{prefix}{name}.docs`
 
 Example (seed catalog):
 

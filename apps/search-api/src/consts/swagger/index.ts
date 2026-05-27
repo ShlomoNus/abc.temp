@@ -37,7 +37,6 @@ export const openApiDocument = {
             enum: ["init", "deleted", "updated"]
           },
           isPublish: { type: "boolean" },
-          fileUrl: { type: "string" },
           name: { type: "string" },
           mediaType: {
             type: "string",

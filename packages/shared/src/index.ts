@@ -1,3 +1,7 @@
+import { Simplify } from "type-fest";
+
+export const PACKAGE_NAME = "@earthquake-reports/shared";
+
 export type FileMediaType = "docs" | "images" | "audio" | "video";
 
 export type DocumentStatus = "init" | "deleted" | "updated";
@@ -16,7 +20,6 @@ export type ArchiveDocument = {
   type: FileMediaType
   status: DocumentStatus
   isPublish: boolean
-  fileUrl: string
   name: string
   mediaType: MediaType
   category: string
@@ -37,4 +40,13 @@ export type ArchiveDocumentSeed = Omit<
   "createdAt" | "updatedAt" | "lastModified"
 >;
 
-export const PACKAGE_NAME = "@earthquake-reports/shared";
+export type AiLambdaBasePayload = {
+  id: number
+  fileLocation: string
+  type: FileMediaType
+  isShortSummaryRequired: boolean
+};
+
+export type AIAddIncomingFileSummarizyPayload = Simplify<Omit<AiLambdaBasePayload, "fileLocation"> & { name: string }>;
+
+export type AIInitSummarizePayload = Omit<AIAddIncomingFileSummarizyPayload, "isShortSummaryRequired">;

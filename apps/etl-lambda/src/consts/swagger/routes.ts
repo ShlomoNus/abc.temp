@@ -281,7 +281,7 @@ export const swaggerRoutes = {
   },
   "/verifyEsBaseDataS3": {
     get: {
-      summary: "Verify esBaseData S3 URLs exist (HeadObject per entry)",
+      summary: "Verify esBaseData S3 objects exist (HeadObject per entry)",
       responses: {
         200: {
           description: "Per-row S3 HeadObject results for esBaseData",
@@ -296,7 +296,6 @@ export const swaggerRoutes = {
                       total: { type: "number" },
                       found: { type: "number" },
                       missing: { type: "number" },
-                      invalidUrl: { type: "number" },
                       error: { type: "number" },
                       items: {
                         type: "array",
@@ -304,18 +303,18 @@ export const swaggerRoutes = {
                           type: "object",
                           properties: {
                             id: { type: "number" },
-                            url: { type: "string" },
+                            s3Key: { type: "string" },
                             status: {
                               type: "string",
-                              enum: ["found", "missing", "invalid_url", "error"]
+                              enum: ["found", "missing", "error"]
                             },
                             detail: { type: "string" }
                           },
-                          required: ["id", "url", "status"]
+                          required: ["id", "s3Key", "status"]
                         }
                       }
                     },
-                    required: ["total", "found", "missing", "invalidUrl", "error", "items"]
+                    required: ["total", "found", "missing", "error", "items"]
                   }
                 },
                 required: ["verifyResult"]
