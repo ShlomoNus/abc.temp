@@ -9,9 +9,9 @@ import { DocumentNotFoundError, updateDocument } from "@/handlers/updateDocument
 import { verifyEsBaseDataS3Urls } from "@/handlers/verifyEsBaseDataS3";
 import { logger } from "@/utils/logger";
 
-const setupRouter = Router();
+const prodRouter = Router();
 
-setupRouter.get("/getAll", async(_: Request, res: Response) => {
+prodRouter.get("/getAll", async(_: Request, res: Response) => {
   try {
     const documents = await getAllDocuments();
 
@@ -25,7 +25,7 @@ setupRouter.get("/getAll", async(_: Request, res: Response) => {
   }
 });
 
-setupRouter.post("/add", async(req: Request, res: Response) => {
+prodRouter.post("/add", async(req: Request, res: Response) => {
   try {
     const { document } = await addDocument(req.body);
 
@@ -53,7 +53,7 @@ setupRouter.post("/add", async(req: Request, res: Response) => {
   }
 });
 
-setupRouter.put("/update/:id", async(req: Request, res: Response) => {
+prodRouter.put("/update/:id", async(req: Request, res: Response) => {
   try {
     const documentId = req.params.id;
 
@@ -95,7 +95,7 @@ setupRouter.put("/update/:id", async(req: Request, res: Response) => {
   }
 });
 
-setupRouter.get("/verifyEsBaseDataS3", async(_: Request, res: Response) => {
+prodRouter.get("/verifyEsBaseDataS3", async(_: Request, res: Response) => {
   try {
     const verifyResult = await verifyEsBaseDataS3Urls();
 
@@ -115,7 +115,7 @@ setupRouter.get("/verifyEsBaseDataS3", async(_: Request, res: Response) => {
   }
 });
 
-setupRouter.get("/loadInitInfo", async(_: Request, res: Response) => {
+prodRouter.get("/loadInitInfo", async(_: Request, res: Response) => {
   try {
     logger.info("loadInitInfo: starting initial data load");
     const initResult = await loadInitialDataToDb();
@@ -140,7 +140,7 @@ setupRouter.get("/loadInitInfo", async(_: Request, res: Response) => {
   }
 });
 
-setupRouter.get("/loadInitSummerize", async(_: Request, res: Response) => {
+prodRouter.get("/loadInitSummerize", async(_: Request, res: Response) => {
   try {
     const summerizeResult = await loadInitSummerize();
 
@@ -153,4 +153,4 @@ setupRouter.get("/loadInitSummerize", async(_: Request, res: Response) => {
   }
 });
 
-export { setupRouter };
+export { prodRouter };

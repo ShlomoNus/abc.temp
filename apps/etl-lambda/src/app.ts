@@ -6,7 +6,7 @@ import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 
 import { cspByPath } from "./middleware/cspByPath";
-import { setupRouter } from "./routes/setupRouter";
+import { prodRouter } from "./routes/prodRouter";
 import { testingRouter } from "./routes/testingRouter";
 import { logger } from "./utils/logger";
 
@@ -42,6 +42,6 @@ app.get("/health", (_: Request, res: Response) => {
 });
 
 app.use("/testing", testingRouter);
-app.use(setupRouter);
+app.use(prodRouter);
 
 export { app };

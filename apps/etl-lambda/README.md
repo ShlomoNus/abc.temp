@@ -10,6 +10,16 @@ pnpm run dev
 
 Default base URL: `http://127.0.0.1:3080` (override with `PORT`).
 
+Copy `.env` and set secrets in `.env.secret` as needed (see [S3 folder naming](#s3-folder-naming) and Elasticsearch vars commented in `.env`).
+
+## Route layout
+
+| Mount | Source | Purpose |
+|-------|--------|---------|
+| `/` | `src/routes/prodRouter.ts` | Product ETL routes (CRUD, init load, S3 bucket check, summarize queue) |
+| `/testing` | `src/routes/testingRouter.ts` | Dev-only Swagger, ES index helpers, document inspection |
+| `/health` | `src/app.ts` | Liveness |
+
 ## API endpoints
 
 Routes are grouped by intent. **Test** routes are blocked outside testing environments (`NODE_ENV` = `development`, `test`, or `qa`); in `staging` / `production` they return `403`.
@@ -20,10 +30,10 @@ Routes are grouped by intent. **Test** routes are blocked outside testing enviro
 | `GET` | `/getAll` | Product | Return all documents from the Elasticsearch index. |
 | `POST` | `/add` | Product | Add a document; server assigns a random 5-digit `id`. |
 | `PUT` | `/update/:id` | Product | Update a document by 5-digit `id` (`id` in the body cannot change). |
-| `GET` | `/verifyEsBaseDataS3` | Product | `HeadBucket` on `S3_BUCKET_NAME`. Returns **503** if the bucket is missing. |
+| `GET` | `/verifyEsBaseDataS3` | Product | Verify `S3_BUCKET_NAME` exists (`HeadBucket`, cached per `S3_BUCKET_VERIFY_CHECKS_PER_DAY`). **200** if OK, **503** if missing/unreachable. |
 | `GET` | `/loadInitInfo` | Product | Ensure the ES index exists and bulk-index seed catalog data (`esBaseData`). |
 | `GET` | `/loadInitSummerize` | Product | Async-invoke the summarize Lambda once per seed file (`InvocationType: Event`). |
-| `GET` | `/testing/openapi.json` | Test | OpenAPI 3 document (setup routes + test routes when env allows). |
+| `GET` | `/testing/openapi.json` | Test | OpenAPI 3 document (product + test routes when env allows). |
 | `GET` | `/testing/api-docs` | Test | Swagger UI for the API. |
 | `GET` | `/testing/documents/ids` | Test | List all document `_id`s in the index. |
 | `GET` | `/testing/documents/:id` | Test | Fetch one document by `_id`. |
@@ -31,7 +41,9 @@ Routes are grouped by intent. **Test** routes are blocked outside testing enviro
 | `PUT` | `/testing/es/index` | Test | Create the Elasticsearch index with mapping if missing. |
 | `DELETE` | `/testing/es/index` | Test | Delete the Elasticsearch index (`ES_INDEX_NAME`). |
 
-**Product** routes are the operational ETL/setup surface (load data, CRUD, S3 verify, summarize queue). **Test** routes are for local/dev inspection and index management. Search endpoints (`/search`, `/getSummary`) live in a separate app and are not mounted here.
+**Product** routes (`prodRouter`) are the operational ETL surface: load data, CRUD, S3 bucket check, summarize queue. **Test** routes are for local/dev inspection and index management. Search endpoints (`/search`, `/getSummary`) live in `search-api` and are not mounted here.
+
+Documents do not store `fileUrl`; S3 keys are built from `name` + folder prefix (see below). Summarize invokes pass `fileLocation` as `{prefix}{name}.docs` to the AI Lambda.
 
 ## S3 folder naming
 
@@ -43,6 +55,15 @@ Archive files live in a single S3 bucket. Folder prefixes are configured via env
 | `S3_BUCKET_VERIFY_CHECKS_PER_DAY` | `1` | Max `HeadBucket` calls per day for `/verifyEsBaseDataS3` (in-process cache; `1` ≈ once every 24h, `24` ≈ hourly) |
 | `S3_INIT_LOAD_FOLDER_PREFIX` | `init-load/` | One-time seed catalog files (used by `esBaseData`) |
 | `S3_INCOMING_FILES_FOLDER_PREFIX` | `incoming-files/` | New uploads added after initial load |
+| `AI_LAMBDA_NAME` | _(empty)_ | Target Lambda for `/loadInitSummerize` async invokes |
+
+### `/verifyEsBaseDataS3` response
+
+```json
+{ "verifyResult": { "bucket": "s3-content-earthquake-dev", "exists": true } }
+```
+
+When the bucket is missing or unreachable, `exists` is `false` (optional `notFound`, `message`) and the API returns **503**.
 
 ### Object key layout
 
