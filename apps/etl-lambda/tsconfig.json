@@ -7,8 +7,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@earthquake-reports/shared": ["../../packages/shared/src/index.ts"]
-    },
-    "types": ["node", "aws-lambda"]
+    }
   },
   "include": ["src/**/*.ts", "scripts/**/*.ts"],
   "exclude": ["dist", "node_modules"],
