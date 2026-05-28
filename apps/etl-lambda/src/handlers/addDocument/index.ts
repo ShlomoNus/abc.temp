@@ -1,13 +1,12 @@
-import { randomInt } from "node:crypto";
-
 import { PENDING_OCR_RESULT } from "@earthquake-reports/shared";
 
 import { ensureEsDocumentsIndex } from "@/handlers/ensureEsIndex";
+import { IdIndexService } from "@/services/idIndex/IdIndexService";
 import { esClient } from "@/utils/esClient";
 import { getEsDocumentsIndexName } from "@/utils/esIndex";
 
-import { ID_ATTEMPTS } from "./consts";
-import { addDocumentBodySchema } from "./schema";
+import { ID_DOCUMENT_CONFLICT_RETRIES } from "./consts";
+import { AddDocumentBodyInput, addDocumentBodySchema } from "./schema";
 import type { AddDocumentResult } from "./types";
 import {
   buildStoredDocument,
@@ -15,7 +14,7 @@ import {
   queueIncomingFileSummarize
 } from "./utils";
 
-export async function addDocument(body: unknown): Promise<AddDocumentResult> {
+export async function addDocument(body: AddDocumentBodyInput): Promise<AddDocumentResult> {
   const parsed = addDocumentBodySchema.safeParse(body);
 
   if (!parsed.success) {
@@ -29,8 +28,8 @@ export async function addDocument(body: unknown): Promise<AddDocumentResult> {
   const nowIso = new Date().toISOString();
   const { lastModified, ...rest } = parsed.data;
 
-  for (let i = 0; i < ID_ATTEMPTS; i++) {
-    const id = randomInt(10000, 100000);
+  for (let i = 0; i < ID_DOCUMENT_CONFLICT_RETRIES; i++) {
+    const { id } = await IdIndexService.allocateNextDocumentId();
     const esBody = {
       ...rest,
       id,
@@ -64,5 +63,5 @@ export async function addDocument(body: unknown): Promise<AddDocumentResult> {
     }
   }
 
-  throw new Error("Could not allocate a unique 5-digit document id; try again.");
+  throw new Error("Could not allocate a unique document id; try again.");
 }
