@@ -14,6 +14,7 @@
     "build:ai": "pnpm --filter @earthquake-reports/shared build && pnpm --filter @earthquake-reports/ai-lambda build",
     "build:search": "pnpm --filter @earthquake-reports/shared build && pnpm --filter @earthquake-reports/search-api build",
     "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
     "typecheck": "pnpm -r typecheck",
     "docker:start": "docker compose up -d",
     "docker:stop": "docker compose stop",
