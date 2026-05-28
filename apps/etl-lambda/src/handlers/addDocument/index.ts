@@ -4,7 +4,9 @@ import type { ArchiveDocument } from "@earthquake-reports/shared";
 import { errors } from "@elastic/elasticsearch";
 
 import { ensureEsDocumentsIndex, getEsDocumentsIndexName } from "@/handlers/ensureEsIndex";
+import { AiService } from "@/services/ai/AiService";
 import { esClient } from "@/utils/esClient";
+import { logger } from "@/utils/logger";
 
 import { addDocumentBodySchema, type AddDocumentBodyInput } from "./schema";
 
@@ -32,6 +34,24 @@ function buildStoredDocument(
 
 function isDocumentIdConflict(error: unknown): boolean {
   return error instanceof errors.ResponseError && error.meta.statusCode === 409;
+}
+
+async function queueIncomingFileSummarize(document: ArchiveDocument): Promise<void> {
+  if (!AiService.aiLambdaName.trim()) {
+    logger.warn("addDocument: incomingFileSummarize skipped (AI_LAMBDA_NAME is not configured)");
+
+    return;
+  }
+
+  const isShortSummaryRequired = document.summary.trim().length === 0
+    && document.longSummary.trim().length === 0;
+
+  await AiService.incomingFileSummarize({
+    id: document.id,
+    name: document.name,
+    type: document.type,
+    isShortSummaryRequired
+  });
 }
 
 export async function addDocument(body: unknown): Promise<AddDocumentResult> {
@@ -67,9 +87,11 @@ export async function addDocument(body: unknown): Promise<AddDocumentResult> {
         refresh: "wait_for"
       });
 
-      return {
-        document: buildStoredDocument({ body: parsed.data, id, nowIso })
-      };
+      const document = buildStoredDocument({ body: parsed.data, id, nowIso });
+
+      await queueIncomingFileSummarize(document);
+
+      return { document };
     }
     catch(error: unknown) {
       if (isDocumentIdConflict(error)) {

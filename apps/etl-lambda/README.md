@@ -28,7 +28,7 @@ Routes are grouped by intent. **Test** routes are blocked outside testing enviro
 |--------|------|------------|-------------|
 | `GET` | `/health` | Public | Simple health check (always available). |
 | `GET` | `/getAll` | Product | Return all documents from the Elasticsearch index. |
-| `POST` | `/add` | Product | Add a document; server assigns a random 5-digit `id`. |
+| `POST` | `/add` | Product | Add a document (random 5-digit `id`), verify file in `incoming-files/`, queue `incomingFileSummarize` when `AI_LAMBDA_NAME` is set. |
 | `PUT` | `/update/:id` | Product | Update a document by 5-digit `id` (`id` in the body cannot change). |
 | `GET` | `/verifyEsBaseDataS3` | Product | Verify `S3_BUCKET_NAME` exists (`HeadBucket`, cached per `S3_BUCKET_VERIFY_CHECKS_PER_DAY`). **200** if OK, **503** if missing/unreachable. |
 | `GET` | `/loadInitInfo` | Product | Ensure the ES index exists and bulk-index seed catalog data (`esBaseData`). |
