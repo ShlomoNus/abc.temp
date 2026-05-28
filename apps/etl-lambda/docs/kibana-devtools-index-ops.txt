@@ -104,3 +104,20 @@ GET /earthquake-documents/_search
 # 5) Delete index (dangerous)
 # ---------------------------------------------
 DELETE /earthquake-documents
+
+# ---------------------------------------------
+# 6) ID counter index (POST /add sequential ids)
+# ---------------------------------------------
+PUT /earthquake-id-index
+{
+  "mappings": {
+    "properties": {
+      "currentId": { "type": "integer" },
+      "addedIds": { "type": "integer" }
+    }
+  }
+}
+
+GET /earthquake-id-index/_doc/state
+
+DELETE /earthquake-id-index

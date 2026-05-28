@@ -28,7 +28,7 @@ Routes are grouped by intent. **Test** routes are blocked outside testing enviro
 |--------|------|------------|-------------|
 | `GET` | `/health` | Public | Simple health check (always available). |
 | `GET` | `/getAll` | Product | Return all documents from the Elasticsearch index. |
-| `POST` | `/add` | Product | Add a document (random 5-digit `id`), verify file in `incoming-files/`, queue `incomingFileSummarize` when `AI_LAMBDA_NAME` is set. |
+| `POST` | `/add` | Product | Add a document with the next sequential `id` from `ES_ID_INDEX_NAME`, verify file in `incoming-files/`, queue `incomingFileSummarize` when `AI_LAMBDA_NAME` is set. |
 | `PUT` | `/update/:id` | Product | Update a document by 5-digit `id` (`id` in the body cannot change). |
 | `GET` | `/verifyEsBaseDataS3` | Product | Verify `S3_BUCKET_NAME` exists (`HeadBucket`, cached per `S3_BUCKET_VERIFY_CHECKS_PER_DAY`). **200** if OK, **503** if missing/unreachable. |
 | `GET` | `/loadInitInfo` | Product | Ensure the ES index exists and bulk-index seed catalog data (`esBaseData`). |
@@ -44,6 +44,19 @@ Routes are grouped by intent. **Test** routes are blocked outside testing enviro
 **Product** routes (`prodRouter`) are the operational ETL surface: load data, CRUD, S3 bucket check, summarize queue. **Test** routes are for local/dev inspection and index management. Search endpoints (`/search`, `/getSummary`) live in `search-api` and are not mounted here.
 
 Documents do not store `fileUrl`; S3 keys are built from `name` + folder prefix (see below). Summarize invokes pass `fileLocation` as `{prefix}{name}.docs` to the AI Lambda.
+
+### Document ID index (`ES_ID_INDEX_NAME`)
+
+`POST /add` allocates ids from a separate Elasticsearch index (default `earthquake-id-index`). A single document `_id` `state` holds:
+
+- **`currentId`** — last id assigned via `/add`
+- **`addedIds`** — ordered list of every id allocated through `/add`
+
+The index is created automatically on first add. When the counter doc is missing, the starting value is `max(addedIds)` if that array has entries; otherwise the highest `id` already in the documents index (so the first `/add` after seed load continues above catalog ids). Seed load (`/loadInitInfo`) keeps fixed ids from `esBaseData` and does not update this counter.
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ES_ID_INDEX_NAME` | `earthquake-id-index` | Counter index for `/add` id allocation |
 
 ## S3 folder naming
 
