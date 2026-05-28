@@ -1,30 +1,13 @@
 import type { ArchiveDocument } from "@earthquake-reports/shared";
-import { estypes } from "@elastic/elasticsearch";
 
-import { CONFIG } from "@/CONFIG";
 import { esClient } from "@/utils/esClient";
 
-const {
-  ES_INDEX_NAME
-} = CONFIG;
-
-const MAX_DOCUMENTS_SIZE = 10_000;
-
-function getIndexName(): string {
-  return ES_INDEX_NAME.trim() || "earthquake-documents";
-}
-
-function mapSearchHit(hit: estypes.SearchHit<ArchiveDocument>): ArchiveDocument | undefined {
-  return hit._source;
-}
-
-function isDefined<T>(value: T | undefined): value is T {
-  return value !== undefined;
-}
+import { MAX_DOCUMENTS_SIZE } from "./consts";
+import { getDocumentsIndexName, isDefined, mapSearchHit } from "./utils";
 
 export async function getAllDocumentIds(): Promise<string[]> {
   const response = await esClient.search<ArchiveDocument>({
-    index: getIndexName(),
+    index: getDocumentsIndexName(),
     size: MAX_DOCUMENTS_SIZE,
     _source: false,
     query: {
@@ -37,7 +20,7 @@ export async function getAllDocumentIds(): Promise<string[]> {
 
 export async function getDocumentById(id: string): Promise<ArchiveDocument | null> {
   const response = await esClient.search<ArchiveDocument>({
-    index: getIndexName(),
+    index: getDocumentsIndexName(),
     size: 1,
     query: {
       ids: {
@@ -51,7 +34,7 @@ export async function getDocumentById(id: string): Promise<ArchiveDocument | nul
 
 export async function getAllDocuments(): Promise<ArchiveDocument[]> {
   const response = await esClient.search<ArchiveDocument>({
-    index: getIndexName(),
+    index: getDocumentsIndexName(),
     size: MAX_DOCUMENTS_SIZE,
     query: {
       match_all: {}

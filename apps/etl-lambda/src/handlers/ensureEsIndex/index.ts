@@ -1,16 +1,8 @@
-import { CONFIG } from "@/CONFIG";
 import { ES_INDEX_MAPPING_BODY } from "@/handlers/loadInitialDataToDb/consts/mapping";
 import { ensureIndexExists } from "@/utils/esClient";
+import { getEsDocumentsIndexName } from "@/utils/esIndex";
 
-export type EnsureEsIndexResult = {
-  indexName: string
-  created: boolean
-  message?: string
-};
-
-export function getEsDocumentsIndexName(): string {
-  return CONFIG.ES_INDEX_NAME.trim() || "earthquake-documents";
-}
+import type { EnsureEsIndexResult } from "./types";
 
 export async function ensureEsDocumentsIndex(): Promise<EnsureEsIndexResult> {
   const indexName = getEsDocumentsIndexName();

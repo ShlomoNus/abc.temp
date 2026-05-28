@@ -1,5 +1,5 @@
-import { getEsDocumentsIndexName } from "@/handlers/ensureEsIndex";
 import { esClient } from "@/utils/esClient";
+import { getEsDocumentsIndexName } from "@/utils/esIndex";
 
 export type EsHealthResult = {
   ok: true

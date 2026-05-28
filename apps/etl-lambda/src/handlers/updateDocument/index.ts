@@ -1,42 +1,13 @@
 import type { ArchiveDocument } from "@earthquake-reports/shared";
 import { errors } from "@elastic/elasticsearch";
-import { z } from "zod";
 
-import { addDocumentBodySchema, type AddDocumentBodyInput } from "@/handlers/addDocument/schema";
-import { getEsDocumentsIndexName } from "@/handlers/ensureEsIndex";
+import { addDocumentBodySchema } from "@/handlers/addDocument/schema";
 import { esClient } from "@/utils/esClient";
+import { getEsDocumentsIndexName } from "@/utils/esIndex";
 
-export type UpdateDocumentResult = {
-  document: ArchiveDocument
-};
-
-export class DocumentNotFoundError extends Error {
-  constructor(id: string) {
-    super(`Document not found: ${id}`);
-    this.name = "DocumentNotFoundError";
-  }
-}
-
-const documentIdParamSchema = z
-  .string()
-  .regex(/^\d{5}$/, "Document id must be a 5-digit number");
-
-function buildStoredDocument(
-  { body, id, createdAt, updatedAt }: {
-    body: AddDocumentBodyInput
-    id: number
-    createdAt: string
-    updatedAt: string
-  }
-): UpdateDocumentResult["document"] {
-  return {
-    ...body,
-    id,
-    lastModified: body.lastModified,
-    createdAt,
-    updatedAt
-  };
-}
+import { documentIdParamSchema } from "./consts";
+import { DocumentNotFoundError, type UpdateDocumentResult } from "./types";
+import { buildStoredDocument } from "./utils";
 
 export async function updateDocument(
   idParam: string,
@@ -90,6 +61,7 @@ export async function updateDocument(
   const esBody = {
     ...rest,
     id: numericId,
+    ocrResult: existing.ocrResult,
     lastModified: lastModified.toISOString(),
     createdAt,
     updatedAt: nowIso
@@ -106,6 +78,7 @@ export async function updateDocument(
     document: buildStoredDocument({
       body: parsedBody.data,
       id: numericId,
+      ocrResult: existing.ocrResult,
       createdAt,
       updatedAt: nowIso
     })

@@ -1,47 +1,10 @@
-import type { ArchiveDocument, ArchiveDocumentSeed } from "@earthquake-reports/shared";
-import { estypes } from "@elastic/elasticsearch";
-
 import { ensureEsDocumentsIndex } from "@/handlers/ensureEsIndex";
 import { esClient } from "@/utils/esClient";
 import { logger } from "@/utils/logger";
 
-import { esBaseData } from "./consts";
+import { BULK_CHUNK_SIZE, esBaseData } from "./consts";
 import { LoadInitialDataResult } from "./types";
-
-const BULK_CHUNK_SIZE = 200;
-
-function chunkArray<T>(arr: T[], chunkSize: number): T[][] {
-  const out: T[][] = [];
-
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    out.push(arr.slice(i, i + chunkSize));
-  }
-
-  return out;
-}
-
-function buildBulkOperations(
-  { indexName, nowIso, chunk }: {
-    indexName: string
-    nowIso: string
-    chunk: ArchiveDocumentSeed[]
-  }
-): estypes.BulkRequest["operations"] {
-  return chunk.flatMap(item => [
-    {
-      index: {
-        _index: indexName,
-        _id: String(item.id)
-      }
-    },
-    {
-      ...item,
-      lastModified: new Date(nowIso),
-      createdAt: nowIso,
-      updatedAt: nowIso
-    } satisfies ArchiveDocument
-  ]);
-}
+import { buildBulkOperations, chunkArray } from "./utils";
 
 export async function loadInitialDataToDb(): Promise<LoadInitialDataResult> {
   logger.info({

@@ -1,11 +1,7 @@
-import { getEsDocumentsIndexName } from "@/handlers/ensureEsIndex";
 import { esClient } from "@/utils/esClient";
+import { getEsDocumentsIndexName } from "@/utils/esIndex";
 
-export type DeleteEsIndexResult = {
-  indexName: string
-  deleted: boolean
-  message?: string
-};
+import type { DeleteEsIndexResult } from "./types";
 
 export async function deleteEsIndex(): Promise<DeleteEsIndexResult> {
   const indexName = getEsDocumentsIndexName();
