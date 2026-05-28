@@ -7,6 +7,13 @@ export const ES_INDEX_MAPPING_BODY: Omit<estypes.IndicesCreateRequest, "index"> 
       type: { type: "keyword" },
       summary: { type: "text" },
       longSummary: { type: "text" },
+      ocrResult: {
+        properties: {
+          status: { type: "keyword" },
+          text: { type: "text" },
+          error: { type: "keyword" }
+        }
+      },
       status: { type: "keyword" },
       isPublish: { type: "boolean" },
       publishDate: { type: "keyword" },
