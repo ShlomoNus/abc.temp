@@ -41,7 +41,6 @@ export const addDocumentBodySchema = z
     subCategory: z.string().min(1, "subCategory is required"),
     language: z.string().min(1, "language is required"),
     summary: z.string(),
-    longSummary: z.string(),
     publishDate: z.string().min(1, "publishDate is required"),
     size: z.string().min(1, "size is required"),
     status: z.preprocess(normalizeEmptyishTo("init"), statusSchema),
@@ -54,15 +53,11 @@ export const addDocumentBodySchema = z
       return;
     }
 
-    const hasSummary = data.summary.trim().length > 0;
-    const hasLongSummary = data.longSummary.trim().length > 0;
-
-    if (!hasSummary && !hasLongSummary) {
+    if (data.summary.trim().length === 0) {
       ctx.addIssue({
         code: "custom",
-        message:
-          "When isPublish is true, at least one of summary or longSummary must be a non-empty string.",
-        path: ["isPublish"]
+        message: "When isPublish is true, summary must be a non-empty string.",
+        path: ["summary"]
       });
     }
   });

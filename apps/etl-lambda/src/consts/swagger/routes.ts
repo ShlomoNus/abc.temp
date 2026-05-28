@@ -84,7 +84,7 @@ export const swaggerRoutes = {
           }
         },
         400: {
-          description: "Validation failed (including publish rule: isPublish requires summary or longSummary)",
+          description: "Validation failed (including publish rule: isPublish requires summary)",
           content: {
             "application/json": {
               schema: {

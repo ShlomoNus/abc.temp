@@ -110,7 +110,6 @@ export const openApiDocument = {
           subCategory: { type: "string" },
           language: { type: "string" },
           summary: { type: "string" },
-          longSummary: { type: "string" },
           publishDate: { type: "string" },
           size: { type: "string" },
           status: {
@@ -136,7 +135,6 @@ export const openApiDocument = {
           "subCategory",
           "language",
           "summary",
-          "longSummary",
           "publishDate",
           "size"
         ]
@@ -164,7 +162,10 @@ export const openApiDocument = {
           subCategory: { type: "string" },
           language: { type: "string" },
           summary: { type: "string" },
-          longSummary: { type: "string" },
+          longSummary: {
+            type: "string",
+            description: "Always empty for documents created via POST /add"
+          },
           publishDate: { type: "string" },
           size: { type: "string" },
           lastModified: {

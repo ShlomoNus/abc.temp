@@ -17,6 +17,7 @@ export function buildStoredDocument(
 ): AddDocumentResult["document"] {
   return {
     ...body,
+    longSummary: "",
     id,
     ocrResult: PENDING_OCR_RESULT,
     lastModified: body.lastModified,
@@ -36,8 +37,7 @@ export async function queueIncomingFileSummarize(document: ArchiveDocument): Pro
     return;
   }
 
-  const isShortSummaryRequired = document.summary.trim().length === 0
-    && document.longSummary.trim().length === 0;
+  const isShortSummaryRequired = document.summary.trim().length === 0;
 
   await AiService.incomingFileSummarize({
     id: document.id,

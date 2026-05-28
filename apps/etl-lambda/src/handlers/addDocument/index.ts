@@ -32,6 +32,7 @@ export async function addDocument(body: AddDocumentBodyInput): Promise<AddDocume
     const { id } = await IdIndexService.allocateNextDocumentId();
     const esBody = {
       ...rest,
+      longSummary: "",
       id,
       ocrResult: PENDING_OCR_RESULT,
       lastModified: lastModified.toISOString(),
