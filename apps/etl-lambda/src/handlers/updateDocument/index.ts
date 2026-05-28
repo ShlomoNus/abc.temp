@@ -60,6 +60,7 @@ export async function updateDocument(
   const { lastModified, ...rest } = parsedBody.data;
   const esBody = {
     ...rest,
+    longSummary: existing.longSummary,
     id: numericId,
     ocrResult: existing.ocrResult,
     lastModified: lastModified.toISOString(),
@@ -77,6 +78,7 @@ export async function updateDocument(
   return {
     document: buildStoredDocument({
       body: parsedBody.data,
+      longSummary: existing.longSummary,
       id: numericId,
       ocrResult: existing.ocrResult,
       createdAt,

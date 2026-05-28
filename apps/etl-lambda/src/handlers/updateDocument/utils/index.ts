@@ -5,8 +5,9 @@ import type { AddDocumentBodyInput } from "@/handlers/addDocument/schema";
 import type { UpdateDocumentResult } from "../types";
 
 export function buildStoredDocument(
-  { body, id, ocrResult, createdAt, updatedAt }: {
+  { body, longSummary, id, ocrResult, createdAt, updatedAt }: {
     body: AddDocumentBodyInput
+    longSummary: string
     id: number
     ocrResult: ArchiveDocument["ocrResult"]
     createdAt: string
@@ -15,6 +16,7 @@ export function buildStoredDocument(
 ): UpdateDocumentResult["document"] {
   return {
     ...body,
+    longSummary,
     id,
     ocrResult,
     lastModified: body.lastModified,
