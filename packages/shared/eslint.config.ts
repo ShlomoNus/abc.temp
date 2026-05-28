@@ -115,7 +115,13 @@ export default defineConfig([
       ],
 
       // --- general best practices ---
-      "no-duplicate-imports": ["error", { includeExports: true }],
+      "no-duplicate-imports": [
+        "error",
+        {
+          includeExports: true,
+          allowSeparateTypeImports: true
+        }
+      ],
       "no-console": [
         "error",
         { allow: ["warn", "error", "info", "time", "timeEnd"] }
